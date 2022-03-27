@@ -51,8 +51,8 @@ int pca96853_init(pca96853 *dev, int adapter, unsigned address, uint16_t freqHz)
         return -1;
     }
 
-    data &= ~BIT_ENCODE(PCA96853_MODE1_RESET, 1);
-    data |= BIT_ENCODE(PCA96853_MODE1_AI, 1);
+    data &= ~BIT_ENCODE(PCA96835_MODE1_RESTART, 1);
+    data |= BIT_ENCODE(PCA96835_MODE1_AI, 1);
     if (i2c_writeReg(adapter, address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
@@ -64,12 +64,14 @@ int pca96853_init(pca96853 *dev, int adapter, unsigned address, uint16_t freqHz)
 int pca96853_reset(pca96853 *dev)
 {
     int status = 0;
+#if 0
     uint8_t data = 0x06;
 
     status = i2c_writeReg(dev->adapter, 0x00, &data);
     if (status == 0) {
         sleep(1);
     }
+#endif
 
     return status;
 }
@@ -78,28 +80,28 @@ uint8_t pca96853_set_freq(pca96853 *dev, uint16_t freqHz)
 {
     uint8_t old_mode = 0;
     uint8_t data = 0;
-    if (i2c_readReg(adapter, address, PCA96835_MODE1, &old_mode) < 0) {
+    if (i2c_readReg(dev->adapter, dev->address, PCA96835_MODE1, &old_mode) < 0) {
         return -1;
     }
-    data = old_mode & ~BIT_ENCODE(PCA96853_MODE1_RESET, 1);
-    data |= BIT_ENCODE(PCA96853_MODE1_SLEEP, 1);
+    data = old_mode & ~BIT_ENCODE(PCA96835_MODE1_RESTART, 1);
+    data |= BIT_ENCODE(PCA96835_MODE1_SLEEP, 1);
     // TODO: Group these up
-    if (i2c_writeReg(adapter, address, PCA96835_MODE1, &data) < 0) {
+    if (i2c_writeReg(dev->adapter, dev->address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
     data = (uint8_t)(dev->clk / (4096 * freqHz));
-    if (i2c_writeReg(adapter, address, PCA96835_PRESCALE, &data) < 0) {
+    if (i2c_writeReg(dev->adapter, dev->address, PCA96835_PRESCALE, &data) < 0) {
         return -1;
     }
     data = old_mode;
-    if (i2c_writeReg(adapter, address, PCA96835_MODE1, &data) < 0) {
+    if (i2c_writeReg(dev->adapter, dev->address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
 
     sleep(1);
 
-    data |= BIT_ENCODE(PCA96853_MODE1_AI, 1);
-    if (i2c_writeReg(adapter, address, PCA96835_MODE1, &data) < 0) {
+    data |= BIT_ENCODE(PCA96835_MODE1_AI, 1);
+    if (i2c_writeReg(dev->adapter, dev->address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
 
@@ -111,8 +113,8 @@ typedef struct PWMData_t {
     uint16_t off;
 } PWMData;
 
-CASSERT(offsetof(struct Data, on) == 0);
-CASSERT(offsetof(struct Data, off) == 2);
+CASSERT(offsetof(struct PWMData_t, on) == 0);
+CASSERT(offsetof(struct PWMData_t, off) == 2);
 
 static void pca96853_enum_duty_packet(uint16_t duty, PWMData *data)
 {
