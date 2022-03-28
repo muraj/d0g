@@ -14,7 +14,7 @@ int i2c_create_adapter(unsigned adapter)
 {
     int fd = 0;
     char filename[20];
-    (void)snprintf(filename, sizeof(filename)-1, "/dev/i2c-%9d", adapter);
+    (void)snprintf(filename, sizeof(filename)-1, "/dev/i2c-%d", adapter);
 
     return open(filename, O_RDWR);
 }
