@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
 project(d0g C)
+
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 0)
 set(VERSION_PATCH 1)
@@ -41,3 +42,7 @@ include_directories(${EXT_DIR})
 file(GLOB_RECURSE SOURCES ${SRC_DIR}/*.c)
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME} m)
+
+install(TARGETS d0g DESTINATION d0g)
+
+include(CPack)

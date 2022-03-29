@@ -1,0 +1,42 @@
+language: c
+os: linux
+dist: focal
+
+env:
+    global:
+        - MAKEFLAGS="-j2"
+
+jobs:
+    include:
+        - name: Linux-gcc-AMD64
+          os: linux
+          compiler: gcc
+
+        - name: Linux-clang-AMD64
+          os: linux
+          compiler: clang
+
+        - name: Linux-gcc-aarch64
+          os: linux
+          addons:
+            apt:
+                packages:
+                    - g++-10-aarch64-linux-gnu
+          env:
+            - CC=aarch64-linux-gnu-gcc-10
+            - CXX=aarch64-linux-gnu-g++-10
+
+        - name: Linux-gcc-arm32
+          os: linux
+          addons:
+            apt:
+                packages:
+                    - g++-10-arm-linux-gnueabihf
+          env:
+            - CC=arm-linux-gnueabihf-gcc-10
+            - CXX=arm-linux-gnueabihf-g++-10
+
+script:
+    - mkdir -p build
+    - (cd build; cmake ..)
+    - make -C build package
