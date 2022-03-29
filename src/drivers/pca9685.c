@@ -39,24 +39,23 @@ typedef struct pca96853_t {
 
 int pca96853_reset(pca96853 *dev);
 uint8_t pca96853_set_freq(pca96853 *dev, uint16_t freqHz);
-int pca96853_init(pca96853 *dev, int adapter, unsigned address, uint16_t freqHz)
+int pca96853_init(pca96853 *dev)
 {
     uint8_t data = 0;
 
-    dev->adapter = adapter;
-    dev->address = address;
-    dev->clk = PCA96835_DEFAULT_CLK_HZ;
+    if (dev->clk == 0) {
+        dev->clk = PCA96835_DEFAULT_CLK_HZ;
+    }
 
-    if (i2c_readReg(adapter, address, PCA96835_MODE1, &data) < 0) {
+    if (i2c_readReg(dev->adapter, dev->address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
 
     data &= ~BIT_ENCODE(PCA96835_MODE1_RESTART, 1);
     data |= BIT_ENCODE(PCA96835_MODE1_AI, 1);
-    if (i2c_writeReg(adapter, address, PCA96835_MODE1, &data) < 0) {
+    if (i2c_writeReg(dev->adapter, dev->address, PCA96835_MODE1, &data) < 0) {
         return -1;
     }
-
 
     return -1;
 }
@@ -127,8 +126,7 @@ int pca96853_set_channel(pca96853 *dev, uint8_t ch, uint16_t duty)
     PWMData data;
     pca96853_enum_duty_packet(duty, &data);
 
-    //i2c_writeReg(dev->adapter, dev->address, PCA96835_LED_ON_L(ch), &data);
-    return -1;
+    return i2c_writeReg(dev->adapter, dev->address, PCA96835_LED_ON_L(ch), &data);
 }
 
 int pca96853_set_channels(pca96853 *dev, uint16_t *duty)
@@ -137,7 +135,6 @@ int pca96853_set_channels(pca96853 *dev, uint16_t *duty)
     for (unsigned i = 0; i < 16; i++) {
         pca96853_enum_duty_packet(duty[i], &data[i]);
     }
-    //i2c_writeReg(dev->adapter, dev->address, PCA96835_LED_ON_L(0), &data);
 
-    return -1;
+    return i2c_writeReg(dev->adapter, dev->address, PCA96835_LED_ON_L(0), &data);
 }

@@ -1,21 +1,20 @@
 #ifndef __IMU_H__
 #define __IMU_H__
 
-struct imu_t;
-typedef imu_t imu;
+#include "HandmadeMath/HandmadeMath.h"
 
-typedef struct vec3f_t {
-    float x, y, z;
-} vec3f;
+typedef int (*pfn_sampleSensors)(float accel[3], float gyro[3], float mag[3], float dt[1], void *user);
 
-typedef struct vec4f_t {
-    float w, x, y, z;
-} vec4f_t;
+typedef struct imu_t {
+    pfn_sampleSensors sample_cb;
+    hmm_quaternion orient;
+    hmm_vec3 ang_vel;
+// Internal
+    hmm_vec3 _integ_gyro;
+} imu;
 
-typedef int (*pfn_sampleSensors)(vec3f *accel, vec3f *gyro, vec3f *mag, void *user);
+int imu_init(imu *ctx);
 
-int imu_init(imu *ctx, pfn_sampleSensors cb, void *user);
-
-int imu_get_orientation(vec4f_t *q, imu *ctx);
+int imu_update(imu *ctx, void *user);
 
 #endif // __IMU_H__
