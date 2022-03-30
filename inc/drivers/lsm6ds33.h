@@ -1,6 +1,8 @@
 #ifndef __LSM6DS33_H__
 #define __LSM6DS33_H__
 
+#define LSM6DS33_DEFAULT_ADDRESS (0x6A)
+
 typedef struct lsm6ds33_t {
     int adapter;
     unsigned address;

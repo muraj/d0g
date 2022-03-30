@@ -1,6 +1,8 @@
 #ifndef __LIS3MDL_H__
 #define __LIS3MDL_H__
 
+#define LIS3MDL_DEFAULT_ADDRESS (0x1E)
+
 typedef struct lis3mdl_t {
     int adapter;
     unsigned address;

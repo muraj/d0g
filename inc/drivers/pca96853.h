@@ -1,6 +1,8 @@
 #ifndef __PCA96853_H__
 #define __PCA96853_H__
 
+#define PCA96853_DEFAULT_ADDRESS (0x40)
+
 typedef struct pca96853_t {
     int adapter;
     unsigned address;
